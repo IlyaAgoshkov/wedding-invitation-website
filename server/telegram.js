@@ -107,6 +107,7 @@ export async function notifyAdminAboutRsvp(bot, entry) {
       `✅ Статус: ${getStatusLabel(entry.attendance)}`,
       `👥 Количество взрослых: ${entry.adults ?? 1}`,
       `🧒 Дети: ${getChildrenLabel(entry.children)}`,
+      `🎵 Любимая песня: ${entry.favoriteSong || 'не указана'}`,
       entry.comment ? `💬 Комментарий: ${entry.comment}` : null,
       '',
       'Ответ успешно получен.',

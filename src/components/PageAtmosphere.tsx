@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { WeddingPetals } from './WeddingPetals'
 
 const BOKEH = [
@@ -29,15 +29,30 @@ const GOLD_SPARKS = [
 
 export function PageAtmosphere() {
   const reducedMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll()
+  const photoY = useTransform(scrollYProgress, [0, 1], ['0%', '7%'])
+  const floralsY = useTransform(scrollYProgress, [0, 1], ['0%', '-5%'])
+  const glowY = useTransform(scrollYProgress, [0, 1], ['0%', '11%'])
 
   return (
     <div className="page-atmosphere" aria-hidden="true">
-      <div className="page-atmosphere__photo" />
+      <motion.div
+        className="page-atmosphere__photo"
+        style={reducedMotion ? undefined : { y: photoY }}
+      />
       <div className="page-atmosphere__overlay" />
-      <div className="page-atmosphere__warm-glow" />
+      <motion.div
+        className="page-atmosphere__warm-glow"
+        style={reducedMotion ? undefined : { y: glowY }}
+      />
       <div className="page-atmosphere__lace" />
 
-      <svg className="page-atmosphere__florals" viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <motion.svg
+        className="page-atmosphere__florals"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="none"
+        style={reducedMotion ? undefined : { y: floralsY }}
+      >
         <defs>
           <radialGradient id="cornerRose" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#fff" stopOpacity="0.5" />
@@ -48,7 +63,7 @@ export function PageAtmosphere() {
         <ellipse cx="1440" cy="900" rx="280" ry="200" fill="url(#cornerRose)" />
         <ellipse cx="0" cy="0" rx="200" ry="160" fill="url(#cornerRose)" opacity="0.4" />
         <ellipse cx="1440" cy="0" rx="200" ry="160" fill="url(#cornerRose)" opacity="0.4" />
-      </svg>
+      </motion.svg>
 
       <WeddingPetals />
 

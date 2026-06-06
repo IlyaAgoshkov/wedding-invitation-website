@@ -19,6 +19,7 @@ export async function buildRsvpWorkbook(responses) {
     { header: 'Статус', key: 'attendance', width: 24 },
     { header: 'Взрослых', key: 'adults', width: 12 },
     { header: 'Дети', key: 'children', width: 24 },
+    { header: 'Любимая песня / музыка', key: 'favoriteSong', width: 34 },
     { header: 'Комментарий', key: 'comment', width: 42 },
   ]
 
@@ -33,6 +34,7 @@ export async function buildRsvpWorkbook(responses) {
       attendance: getStatusLabel(item.attendance),
       adults: item.attendance === 'yes' ? item.adults ?? 1 : 0,
       children: item.attendance === 'yes' ? getChildrenLabel(item.children) : '—',
+      favoriteSong: item.favoriteSong || '—',
       comment: item.comment || '—',
     })
   })

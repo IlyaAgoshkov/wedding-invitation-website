@@ -1,4 +1,5 @@
 import { InvitationCard } from './InvitationCard'
+import { RibbonBow } from './RibbonBow'
 import { ScrollReveal } from './ScrollReveal'
 
 const palette = [
@@ -6,7 +7,6 @@ const palette = [
   { color: '#D9E4EC', name: 'Небесный' },
   { color: '#F2E8D5', name: 'Бежевый' },
   { color: '#FAFAFA', name: 'Молочный' },
-  { color: '#D1D1D1', name: 'Светло-серый' },
 ]
 
 export function DressCodeLocation() {
@@ -14,6 +14,8 @@ export function DressCodeLocation() {
     <section id="dress-code" className="section dress-code-section">
       <ScrollReveal>
         <InvitationCard className="dress-code-card">
+          <RibbonBow className="dress-code-card__bow dress-code-card__bow--left" />
+          <RibbonBow className="dress-code-card__bow dress-code-card__bow--right" flip />
           <h2 className="card-title">ДРЕСС-КОД</h2>
           <p className="dress-code-intro">
             Нам будет приятно, если вы поддержите цветовую палитру нашей свадьбы —

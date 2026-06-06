@@ -55,10 +55,6 @@ export function GalleryCarousel({
   const [index, setIndex] = useState(initialIndex)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
-  useEffect(() => {
-    setIndex(initialIndex)
-  }, [initialIndex])
-
   const goPrev = useCallback(() => {
     setIndex((current) => (current - 1 + images.length) % images.length)
   }, [images.length])
@@ -175,10 +171,6 @@ export function GalleryCarouselLightbox({
   const reducedMotion = useReducedMotion()
   const [index, setIndex] = useState(initialIndex)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
-
-  useEffect(() => {
-    setIndex(initialIndex)
-  }, [initialIndex])
 
   const goPrev = useCallback(() => {
     setIndex((current) => (current - 1 + images.length) % images.length)

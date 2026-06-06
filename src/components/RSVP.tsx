@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { CSSProperties, FormEvent } from 'react'
 import { staggerContainer, staggerItemFade, instant } from '../motion/variants'
 import { AnimatedButton } from './AnimatedButton'
 import { InvitationCard } from './InvitationCard'
@@ -46,7 +46,9 @@ export function RSVP() {
           lastName,
           firstName,
           attendance: attendanceValue,
+          adults: attendanceValue === 'yes' ? formData.get('adults') : '0',
           children: attendanceValue === 'yes' ? formData.get('children') : 'none',
+          favoriteSong: attendanceValue === 'yes' ? String(formData.get('favoriteSong') ?? '').trim() : '',
           comment: String(formData.get('comment') ?? '').trim(),
         }),
       })
@@ -88,12 +90,26 @@ export function RSVP() {
           animate={{ opacity: 1 }}
           transition={{ duration: reducedMotion ? 0.01 : 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
+          <div className="rsvp-success__burst" aria-hidden="true">
+            {Array.from({ length: 12 }, (_, index) => (
+              <span key={index} style={{ '--burst-index': index } as CSSProperties} />
+            ))}
+          </div>
           <motion.div
             className="rsvp-success__card"
             initial={reducedMotion ? false : { opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: reducedMotion ? 0.01 : 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
+            <div className="rsvp-success__petals" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="rsvp-success__heart" aria-hidden="true">
+              ♥
+            </div>
             <h3 id="rsvp-success-title" className="rsvp-success__title">
               {SUCCESS_MESSAGES[successType].title}
             </h3>
@@ -176,22 +192,47 @@ export function RSVP() {
 
             <AnimatePresence initial={false}>
               {attendance === 'yes' ? (
-                <motion.label
-                  key="children-field"
-                  className="rsvp-form__field-label"
+                <motion.div
+                  key="guest-details"
+                  className="rsvp-form__guest-details"
                   initial={reducedMotion ? false : { opacity: 0, height: 0, marginTop: 0 }}
                   animate={{ opacity: 1, height: 'auto', marginTop: 0 }}
                   exit={reducedMotion ? undefined : { opacity: 0, height: 0, marginTop: 0 }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <span className="rsvp-form__field-title">Будут ли с вами дети?</span>
-                  <select name="children" defaultValue="none" required disabled={isSubmitting}>
-                    <option value="none">Нет</option>
-                    <option value="1">Да, 1 ребёнок</option>
-                    <option value="2">Да, 2 ребёнка</option>
-                    <option value="3plus">Да, 3 и более детей</option>
-                  </select>
-                </motion.label>
+                  <div className="rsvp-form__row">
+                    <label className="rsvp-form__field-label">
+                      <span className="rsvp-form__field-title">Сколько будет взрослых?</span>
+                      <select name="adults" defaultValue="1" required disabled={isSubmitting}>
+                        <option value="1">1 взрослый</option>
+                        <option value="2">2 взрослых</option>
+                        <option value="3">3 взрослых</option>
+                        <option value="4">4 взрослых</option>
+                      </select>
+                    </label>
+
+                    <label className="rsvp-form__field-label">
+                      <span className="rsvp-form__field-title">Будут ли с вами дети?</span>
+                      <select name="children" defaultValue="none" required disabled={isSubmitting}>
+                        <option value="none">Нет</option>
+                        <option value="1">Да, 1 ребёнок</option>
+                        <option value="2">Да, 2 ребёнка</option>
+                        <option value="3plus">Да, 3 и более детей</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="rsvp-form__field-label">
+                    <span className="rsvp-form__field-title">Любимая песня для вечера</span>
+                    <input
+                      type="text"
+                      name="favoriteSong"
+                      placeholder="Например: исполнитель — название песни"
+                      maxLength={120}
+                      disabled={isSubmitting}
+                    />
+                  </label>
+                </motion.div>
               ) : null}
             </AnimatePresence>
 

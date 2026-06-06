@@ -19,13 +19,19 @@ export function CountdownDigit({ value, label }: CountdownDigitProps) {
           <motion.span
             key={display}
             className="countdown-digit__value"
-            initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+            initial={
+              reducedMotion
+                ? false
+                : { opacity: 0, y: 18, rotateX: -82, transformPerspective: 700 }
+            }
             animate={
               reducedMotion
-                ? { opacity: 1, y: 0 }
+                ? { opacity: 1, y: 0, rotateX: 0 }
                 : {
                     opacity: 1,
                     y: 0,
+                    rotateX: 0,
+                    transformPerspective: 700,
                     textShadow: [
                       '0 0 0px rgba(255,255,255,0)',
                       '0 0 18px rgba(255,255,255,0.75)',
@@ -33,9 +39,13 @@ export function CountdownDigit({ value, label }: CountdownDigitProps) {
                     ],
                   }
             }
-            exit={reducedMotion ? undefined : { opacity: 0, y: -10 }}
+            exit={
+              reducedMotion
+                ? undefined
+                : { opacity: 0, y: -18, rotateX: 82, transformPerspective: 700 }
+            }
             transition={{
-              duration: reducedMotion ? 0.01 : 0.55,
+              duration: reducedMotion ? 0.01 : 0.62,
               ease: [0.22, 1, 0.36, 1],
               textShadow: { duration: 0.7, ease: 'easeOut' },
             }}

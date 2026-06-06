@@ -145,24 +145,31 @@ export function Program() {
       </ScrollReveal>
 
       <motion.div
-        className="program-grid"
+        className="program-timeline"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         variants={reducedMotion ? instant : staggerContainer(0.13, 0.1)}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <motion.article
             key={item.id}
-            className="glass-card program-card"
+            className={`program-timeline__item program-timeline__item--${index % 2 === 0 ? 'left' : 'right'}`}
             variants={reducedMotion ? instant : staggerItemSlide}
           >
-            <div className="program-card__icon">
-              <ProgramIcon type={item.icon} />
+            <div className="program-timeline__marker" aria-hidden="true">
+              <span />
             </div>
-            <p className="program-card__time">{item.time}</p>
-            <h3 className="program-card__title">{item.title}</h3>
-            <p className="program-card__description">{item.description}</p>
+            <div className="glass-card program-card">
+              <div className="program-card__icon">
+                <ProgramIcon type={item.icon} />
+              </div>
+              <div className="program-card__content">
+                <p className="program-card__time">{item.time}</p>
+                <h3 className="program-card__title">{item.title}</h3>
+                <p className="program-card__description">{item.description}</p>
+              </div>
+            </div>
           </motion.article>
         ))}
       </motion.div>

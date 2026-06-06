@@ -1,11 +1,12 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useMusic } from '../context/MusicContext'
+import { useMusic } from '../context/music'
 
 const links = [
   { href: '#hero', label: 'Главная' },
   { href: '#countdown', label: 'До свадьбы' },
+  { href: '#love-story', label: 'Наша история' },
   { href: '#program', label: 'Программа' },
   { href: '#banquet', label: 'Банкет' },
   { href: '#dress-code', label: 'Дресс-код' },
@@ -15,18 +16,48 @@ const links = [
 
 export function Navigation() {
   const [open, setOpen] = useState(false)
+  const [activeHref, setActiveHref] = useState('#hero')
   const reducedMotion = useReducedMotion()
   const { isPlaying, toggleMusic } = useMusic()
 
   const closeMenu = useCallback(() => setOpen(false), [])
 
   const handleNav = (href: string) => {
+    setActiveHref(href)
     closeMenu()
     window.setTimeout(() => {
       const el = document.querySelector(href)
       el?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' })
     }, reducedMotion ? 0 : 180)
   }
+
+  useEffect(() => {
+    const sections = links
+      .map((link) => document.querySelector(link.href))
+      .filter((section): section is Element => section !== null)
+
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+
+        if (visible?.target.id) {
+          setActiveHref(`#${visible.target.id}`)
+        }
+      },
+      {
+        rootMargin: '-35% 0px -45% 0px',
+        threshold: [0.12, 0.24, 0.36, 0.48],
+      },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -127,6 +158,8 @@ export function Navigation() {
                     >
                       <a
                         href={link.href}
+                        className={activeHref === link.href ? 'site-nav__link--active' : undefined}
+                        aria-current={activeHref === link.href ? 'page' : undefined}
                         onClick={(event) => {
                           event.preventDefault()
                           handleNav(link.href)
