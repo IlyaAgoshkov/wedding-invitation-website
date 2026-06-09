@@ -26,8 +26,14 @@ export async function buildRsvpWorkbook(responses) {
   sheet.getRow(1).font = { bold: true }
 
   responses.forEach((item) => {
+    const createdAt = item.createdAt ? new Date(item.createdAt) : null
+    const createdAtLabel =
+      createdAt && !Number.isNaN(createdAt.getTime())
+        ? createdAt.toLocaleString('ru-RU')
+        : '—'
+
     sheet.addRow({
-      createdAt: new Date(item.createdAt).toLocaleString('ru-RU'),
+      createdAt: createdAtLabel,
       lastName: item.lastName ?? getFullName(item).split(' ')[0] ?? '—',
       firstName:
         item.firstName ?? (getFullName(item).split(' ').slice(1).join(' ') || '—'),

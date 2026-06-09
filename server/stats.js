@@ -15,13 +15,15 @@ export function calculateRsvpStats(responses) {
     0,
   )
 
+  const totalGuests = adults + children
+
   return {
     responsesTotal: responses.length,
-    confirmedCount: confirmed.length,
+    confirmedCount: totalGuests,
     declinedCount: responses.filter((response) => response.attendance === 'no').length,
     adults,
     children,
-    totalGuests: adults + children,
+    totalGuests,
   }
 }
 

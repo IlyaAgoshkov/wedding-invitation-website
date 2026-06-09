@@ -1,9 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import { PORT, TELEGRAM_ADMIN_ID } from './config.js'
+import { buildAdminExport, getAdminDashboard } from './admin-api.js'
+import { requireAdmin } from './auth.js'
 import { CHILDREN_VALUES } from './children.js'
-import { addResponse } from './storage.js'
-import { createBot, notifyAdminAboutRsvp, setupBotCommands } from './telegram.js'
+import { upsertResponse } from './storage.js'
+import { createBot, notifyAdminAboutRsvp, setupBotCommands, setupWebAppMenu } from './telegram.js'
 
 const app = express()
 const bot = createBot()
@@ -70,7 +72,7 @@ app.post('/api/rsvp', async (req, res) => {
       return
     }
 
-    const entry = await addResponse({
+    const { entry, isUpdate } = await upsertResponse({
       lastName,
       firstName,
       attendance,
@@ -81,15 +83,46 @@ app.post('/api/rsvp', async (req, res) => {
     })
 
     try {
-      await notifyAdminAboutRsvp(bot, entry)
+      await notifyAdminAboutRsvp(bot, entry, { isUpdate })
     } catch (error) {
       console.error('[telegram] Failed to notify admin:', error)
     }
 
-    res.status(201).json({ ok: true })
+    res.status(isUpdate ? 200 : 201).json({ ok: true, updated: isUpdate })
   } catch (error) {
     console.error('[api/rsvp] Failed to save response:', error)
     res.status(500).json({ error: 'Не удалось отправить ответ. Попробуйте позже.' })
+  }
+})
+
+app.get('/api/admin/dashboard', requireAdmin, async (_req, res) => {
+  try {
+    const dashboard = await getAdminDashboard()
+    res.json(dashboard)
+  } catch (error) {
+    console.error('[api/admin/dashboard] Failed:', error)
+    res.status(500).json({ error: 'Не удалось загрузить список гостей.' })
+  }
+})
+
+app.get('/api/admin/export', requireAdmin, async (_req, res) => {
+  try {
+    const { buffer, filename, count } = await buildAdminExport()
+
+    if (count === 0) {
+      res.status(404).json({ error: 'Пока нет ни одного ответа RSVP.' })
+      return
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.send(buffer)
+  } catch (error) {
+    console.error('[api/admin/export] Failed:', error)
+    res.status(500).json({ error: 'Не удалось подготовить Excel-отчёт.' })
   }
 })
 
@@ -101,18 +134,25 @@ app.listen(PORT, () => {
 
 let botRunning = false
 
+process.on('unhandledRejection', (error) => {
+  console.error('[process] Unhandled rejection:', error)
+})
+
 async function startBot() {
   if (!bot) return
 
   try {
+    await bot.telegram.deleteWebhook({ drop_pending_updates: true })
+
     const me = await bot.telegram.getMe()
     console.log(`[telegram] Authenticated as @${me.username}`)
 
-    await bot.launch()
+    await bot.launch({ dropPendingUpdates: true })
     botRunning = true
 
     try {
       await setupBotCommands(bot)
+      await setupWebAppMenu(bot)
     } catch (error) {
       console.warn('[telegram] Admin menu will be set after /start:', error.message)
     }

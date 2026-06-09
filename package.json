@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:admin": "vite --config vite.config.admin.ts",
     "dev:server": "node server/index.js",
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
+    "dev:admin:all": "concurrently \"npm run dev:server\" \"npm run dev:admin\"",
     "build": "tsc -b && vite build",
+    "build:admin": "tsc -b tsconfig.admin.json && vite build --config vite.config.admin.ts",
+    "build:all": "npm run build && npm run build:admin",
     "lint": "eslint .",
     "preview": "vite preview",
+    "preview:admin": "vite preview --config vite.config.admin.ts",
     "start": "node server/index.js"
   },
   "dependencies": {
