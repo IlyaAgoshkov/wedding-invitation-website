@@ -12,6 +12,8 @@
     "build": "tsc -b && vite build",
     "build:admin": "tsc -b tsconfig.admin.json && vite build --config vite.config.admin.ts",
     "build:all": "npm run build && npm run build:admin",
+    "deploy:admin": "node scripts/deploy-admin.mjs",
+    "verify:admin": "node scripts/verify-deploy.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:admin": "vite preview --config vite.config.admin.ts",
