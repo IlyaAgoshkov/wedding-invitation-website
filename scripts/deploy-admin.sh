@@ -17,6 +17,14 @@ sudo mkdir -p "$WEB_ROOT"
 sudo rsync -a --delete "$ROOT/dist-admin/" "$WEB_ROOT/"
 sudo chown -R www-data:www-data "$WEB_ROOT"
 
+echo "[deploy] Build marker:"
+grep -o "Сборка:[^\"']*" "$WEB_ROOT"/assets/*.js | head -1 || true
+
+if grep -R "Скачать Excel" "$WEB_ROOT" >/dev/null 2>&1; then
+  echo "[deploy] ERROR: old build still contains Excel button text"
+  exit 1
+fi
+
 echo "[deploy] Restarting API..."
 if pm2 describe dimaalena-api >/dev/null 2>&1; then
   pm2 restart dimaalena-api

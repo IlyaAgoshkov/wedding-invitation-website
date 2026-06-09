@@ -31,3 +31,5 @@ interface TelegramGlobal {
 interface Window {
   Telegram?: TelegramGlobal
 }
+
+declare const __APP_BUILD_VERSION__: string
