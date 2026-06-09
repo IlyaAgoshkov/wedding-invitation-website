@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -eu
 
 WEB_ROOT="${WEB_ROOT:-/var/www/app.dimaalena.ru}"
 PROJECT_ROOT="${PROJECT_ROOT:-$HOME/wedding-invitation-website}"
@@ -8,16 +8,24 @@ echo "=== nginx root ==="
 grep -E '^\s*root\s' /etc/nginx/sites-available/app.dimaalena.ru || true
 
 echo
-echo "=== files in nginx root ==="
-ls -la "$WEB_ROOT" 2>/dev/null || echo "MISSING: $WEB_ROOT"
+echo "=== deployed index.html ==="
+head -n 25 "$WEB_ROOT/index.html" 2>/dev/null || echo "MISSING: $WEB_ROOT/index.html"
+
+echo
+echo "=== index.html sanity ==="
+if grep -q '/src/main.tsx' "$WEB_ROOT/index.html" 2>/dev/null; then
+  echo "BAD: dev index.html deployed (contains /src/main.tsx)"
+else
+  echo "OK: production index.html"
+fi
+
+echo
+echo "=== deployed assets ==="
+ls -la "$WEB_ROOT/assets/" 2>/dev/null || echo "MISSING: assets folder"
 
 echo
 echo "=== Excel button in deployed JS (should be empty) ==="
 grep -R "Скачать Excel" "$WEB_ROOT" 2>/dev/null || echo "OK: not found"
-
-echo
-echo "=== build marker in deployed JS ==="
-grep -o "Сборка:[^\"']*" "$WEB_ROOT"/assets/*.js 2>/dev/null | head -1 || echo "MISSING: old build without version marker"
 
 echo
 echo "=== API on :3001 ==="
@@ -30,9 +38,6 @@ echo "=== pm2 ==="
 pm2 status
 
 echo
-echo "=== project dist-admin ==="
-ls -la "$PROJECT_ROOT/dist-admin/index.html" 2>/dev/null || echo "MISSING: run npm run build:admin in project"
-
-echo
-echo "=== live site headers ==="
+echo "=== live site ==="
 curl -I https://app.dimaalena.ru 2>/dev/null | head -5
+curl -I https://app.dimaalena.ru/assets/ 2>/dev/null | head -3

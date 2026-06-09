@@ -111,7 +111,9 @@ export default function App() {
           <p className="header__updated">
             Обновлено: {formatUpdatedAt(dashboard?.updatedAt ?? null)}
           </p>
-          <p className="header__version">Сборка: {__APP_BUILD_VERSION__} (MSK)</p>
+          <p className="header__version">
+            Сборка: {typeof __APP_BUILD_VERSION__ === 'string' ? __APP_BUILD_VERSION__ : 'unknown'} (MSK)
+          </p>
         </div>
       </header>
 
